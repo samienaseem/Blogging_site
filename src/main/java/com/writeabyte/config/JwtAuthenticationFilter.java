@@ -17,16 +17,35 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtil jwtTokenProvider;
+    
+    private static final Set<String> PUBLIC_ENDPOINTS = new HashSet<>();
+    
+    static {
+        // Add your public endpoints
+        PUBLIC_ENDPOINTS.add("/login");
+        PUBLIC_ENDPOINTS.add("/signup");
+        PUBLIC_ENDPOINTS.add("/index"); // Add more as needed
+    }
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+    	
+    	String requestPath=request.getRequestURI();
+    	if(isPublicEndpoint(requestPath)) {
+    		filterChain.doFilter(request, response);
+    		return;
+    	}
+    	
         // Extract token from Authorization header
         String token = extractToken(request);
 
@@ -38,6 +57,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // Token is invalid, send unauthorized response
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         }
+    }
+    
+    private boolean isPublicEndpoint(String requestPath) {
+        // Simple pattern matching for exact paths
+        return PUBLIC_ENDPOINTS.contains(requestPath);
     }
 
     public String extractToken(HttpServletRequest request) {
