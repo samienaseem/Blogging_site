@@ -22,6 +22,9 @@ public class User {
 	private String email;
 
 	private String password;
+	
+	@Column(unique=true)
+	private String urn;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "registration_date")
@@ -74,4 +77,13 @@ public class User {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public String getUrn() {
+		return urn;
+	}
+
+	public void setUrn(String urn) {
+		this.urn = urn;
+	}
+
 }

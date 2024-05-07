@@ -30,9 +30,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     
     static {
         // Add your public endpoints
-        PUBLIC_ENDPOINTS.add("/login");
-        PUBLIC_ENDPOINTS.add("/signup");
+        PUBLIC_ENDPOINTS.add("/api/login");
+        PUBLIC_ENDPOINTS.add("/api/signup");
         PUBLIC_ENDPOINTS.add("/index"); // Add more as needed
+        PUBLIC_ENDPOINTS.add("/api/");
     }
 
 

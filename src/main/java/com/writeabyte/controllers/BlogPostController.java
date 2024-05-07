@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,9 +28,11 @@ import com.writeabyte.models.response.BlogPostResponse;
 import com.writeabyte.services.BlogPostService;
 import com.writeabyte.services.CommentService;
 import com.writeabyte.services.LikeService;
-
+//eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJzYW1hci5uYXNlZSwuOTdAZ21haWwuY29tIiwiaWF0IjoxNzE0OTgxNzAwLCJleHAiOjE3MTQ5ODUzMDB9.mICzsBPNEPicoHuAjzs1SpAl00x4SdYVLsopm4rJdjch9QklF6YEXhNLYUMj9gJDh91P5ly08qYPRBeSe5E8RQ
+// user id=3
 @RestController
-@RequestMapping("/api/blog-posts")
+@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/api")
 public class BlogPostController {
 	@Autowired
 	private BlogPostService blogPostService;
@@ -45,6 +48,15 @@ public class BlogPostController {
 
 	@Autowired
 	private JwtAuthenticationFilter jwtAuthenticationFilter;
+	
+	@GetMapping("/")
+	public ResponseEntity<BlogPostResponse> getAllBlogs(HttpServletRequest request) {
+		BlogPostResponse blogPostResponse = new BlogPostResponse();
+		//String token =  jwtAuthenticationFilter.extractToken(request);
+		
+		return ResponseEntity.ok(blogPostService.getAllPostsWithLikesAndComments());
+		
+	}
 
 	@GetMapping("/user/{userId}")
 	public ResponseEntity<List<BlogPost>> getBlogPostsByUserId(@PathVariable Long userId) {
@@ -55,7 +67,8 @@ public class BlogPostController {
 	@PostMapping("/create")
 	public ResponseEntity<BlogPosts> createBlogPost(HttpServletRequest request, @RequestBody BlogPost blogPost) throws Exception {
 		BlogPosts createdBlogPost = new BlogPosts();
-		String token = (String) request.getAttribute("jwtToken");
+		//String token = (String) request.getAttribute("jwtToken");
+		String token =  jwtAuthenticationFilter.extractToken(request);
 		if (jwtUtil.validateToken(token)) {
 			createdBlogPost = blogPostService.createBlogPost(blogPost);
 			return ResponseEntity.ok(createdBlogPost);
@@ -88,15 +101,15 @@ public class BlogPostController {
 		return ResponseEntity.ok(comments);
 	}
 
-	@GetMapping("/all-posts")
-	public ResponseEntity<BlogPostResponse> getAllBlogs(HttpServletRequest request) {
-		BlogPostResponse blogPostResponse = new BlogPostResponse();
-		String token =  jwtAuthenticationFilter.extractToken(request);
-		if (jwtUtil.validateToken(token)) {
-			return ResponseEntity.ok(blogPostService.getAllPostsWithLikesAndComments());
-		}
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(blogPostResponse);
-	}
+//	@GetMapping("/all-posts")
+//	public ResponseEntity<BlogPostResponse> getAllBlogs(HttpServletRequest request) {
+//		BlogPostResponse blogPostResponse = new BlogPostResponse();
+//		String token =  jwtAuthenticationFilter.extractToken(request);
+//		if (jwtUtil.validateToken(token)) {
+//			return ResponseEntity.ok(blogPostService.getAllPostsWithLikesAndComments());
+//		}
+//		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(blogPostResponse);
+//	}
 
 	@PostMapping("/all-posts/{userId}")
 	public ResponseEntity<BlogPostResponse> getBlogsByUserId(@PathVariable Long userId) {

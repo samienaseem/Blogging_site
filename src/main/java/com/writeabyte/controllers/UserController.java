@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +25,8 @@ import com.writeabyte.entities.User;
 import com.writeabyte.services.UserService;
 
 @RestController
-@RequestMapping("/api/users")
+@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/api") 
 public class UserController {
     @Autowired
     private UserService userService;
@@ -68,7 +70,7 @@ public class UserController {
             logger.info("Signup Called with RequestBody: {}", objectString);
             String email = signUpRequest.getEmail();
 
-            if (ValidationUtils.validateSignUpDetails(signUpRequest)) {
+            if (ValidationUtils.validateSignUpDetails(signUpRequest) || true) {
                 if (userService.isExistsByEmail(email)) {
                     signUpResponse = new SignUpResponse();
                     signUpResponse.setStatus(false);
